@@ -8,6 +8,11 @@ require(__DIR__.'/sendmessage.php');
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}input` ORDER BY `time` ASC");
 $res = $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
+foreach ($row as $data) {
+	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}input` WHERE `hash` = :hash");
+	$sth->bindValue(":hash", $data["hash"]);
+	$res = $sth->execute();
+}
 function GetTmid() {
 	global $C, $G;
 	$res = cURL($C['FBAPI']."me/conversations?fields=participants,updated_time&access_token=".$C['FBpagetoken']);
@@ -45,28 +50,28 @@ function GetTmid() {
 	file_put_contents("updated_time.txt", $newesttime);
 }
 function GetResult($res) {
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe52.gif\".*?>/", "(一)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe53.gif\".*?>/", "(二)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe54.gif\".*?>/", "(三)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe55.gif\".*?>/", "(四)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe56.gif\".*?>/", "(五)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe57.gif\".*?>/", "(六)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe58.gif\".*?>/", "(七)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe59_?.gif\".*?>/", "(1)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5a_?.gif\".*?>/", "(2)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5b_?.gif\".*?>/", "(3)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5c_?.gif\".*?>/", "(4)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5d_?.gif\".*?>/", "(5)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5e_?.gif\".*?>/", "(6)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5f_?.gif\".*?>/", "(7)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe60_?.gif\".*?>/", "(8)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe61_?.gif\".*?>/", "(9)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe62_?.gif\".*?>/", "(10)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe63_?.gif\".*?>/", "(11)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe64_?.gif\".*?>/", "(12)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe65_?.gif\".*?>/", "(13)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe66_?.gif\".*?>/", "(14)", $res);
-	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe67_?.gif\".*?>/", "(15)", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe52\.gif\".*?>/", "(一) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe53\.gif\".*?>/", "(二) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe54\.gif\".*?>/", "(三) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe55\.gif\".*?>/", "(四) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe56\.gif\".*?>/", "(五) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe57\.gif\".*?>/", "(六) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe58\.gif\".*?>/", "(七) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe59_?\.jpg\".*?>/", "(1) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5a_?\.jpg\".*?>/", "(2) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5b_?\.jpg\".*?>/", "(3) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5c_?\.jpg\".*?>/", "(4) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5d_?\.jpg\".*?>/", "(5) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5e_?\.jpg\".*?>/", "(6) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe5f_?\.jpg\".*?>/", "(7) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe60_?\.jpg\".*?>/", "(8) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe61_?\.jpg\".*?>/", "(9) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe62_?\.jpg\".*?>/", "(10) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe63_?\.jpg\".*?>/", "(11) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe64_?\.jpg\".*?>/", "(12) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe65_?\.jpg\".*?>/", "(13) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe66_?\.jpg\".*?>/", "(14) ", $res);
+	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe67_?\.jpg\".*?>/", "(15) ", $res);
 	$response = "";
 	if (preg_match("/字詞.*?<\/b><\/th><td class=\"std2\">(.*?)<\/td>/", $res, $m)) {
 		$response .= "字詞：".html_entity_decode(strip_tags($m[1]))."\n";
@@ -93,26 +98,32 @@ function GetResult($res) {
 	}
 	return $response;
 }
-$res = cURL("http://dict.revised.moe.edu.tw/cbdic/search.htm", false, true);
-if ($res === false) {
-	WriteLog("fetch page 1 fail");
-	exit;
+$W["success"] = true;
+if ($W["success"]) {
+	$res = cURL("http://dict.revised.moe.edu.tw/cbdic/search.htm", false, true);
+	if ($res === false) {
+		$W["success"] = false;
+		WriteLog("fetch page 1 fail");
+	}
 }
-preg_match("/<a href=\"\/cgi-bin\/cbdic\/gsweb\.cgi\/\?&o=(.*?)&\" title/", $res, $m);
-$W["o"] = $m[1];
-$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi/?&o={$W["o"]}&", false, true);
-if ($res === false) {
-	WriteLog("fetch page 2 fail");
-	exit;
+if ($W["success"]) {
+	preg_match("/<a href=\"\/cgi-bin\/cbdic\/gsweb\.cgi\/\?&o=(.*?)&\" title/", $res, $m);
+	$W["o"] = $m[1];
+	$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi/?&o={$W["o"]}&", false, true);
+	if ($res === false) {
+		$W["success"] = false;
+		WriteLog("fetch page 2 fail");
+		exit;
+	}
 }
-preg_match("/<a href=\"\/cgi-bin\/cbdic\/gsweb\.cgi\?ccd=(.*?)&o=(.*?)&sec=(.*?)&index=.*?\" title/", $res, $m);
-$W["ccd"] = $m[1];
-$W["o"] = $m[2];
-$W["sec"] = $m[3];
-foreach ($row as $data) {
-	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}input` WHERE `hash` = :hash");
-	$sth->bindValue(":hash", $data["hash"]);
-	$res = $sth->execute();
+if ($W["success"]) {
+	if (preg_match("/<a href=\"\/cgi-bin\/cbdic\/gsweb\.cgi\?ccd=(.*?)&o=(.*?)&sec=(.*?)&index=.*?\" title/", $res, $m)) {
+		$W["ccd"] = $m[1];
+		$W["o"] = $m[2];
+		$W["sec"] = $m[3];
+	} else {
+		WriteLog("get token fail");
+	}
 }
 foreach ($row as $data) {
 	$input = json_decode($data["input"], true);
@@ -142,6 +153,10 @@ foreach ($row as $data) {
 			}
 			$tmid = $row["tmid"];
 			if (!isset($messaging['message']['text'])) {
+				SendMessage($tmid, $M["nottext"]);
+				continue;
+			}
+			if (!$W["success"]) {
 				SendMessage($tmid, $M["nottext"]);
 				continue;
 			}
