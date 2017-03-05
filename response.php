@@ -20,7 +20,7 @@ function GetTmid() {
 	$newesttime = $updated_time;
 	while (true) {
 		if ($res === false) {
-			WriteLog("fetch uid: curl fail");
+			WriteLog("[follow][error][getuid]");
 			break;
 		}
 		$res = json_decode($res, true);
@@ -103,7 +103,7 @@ if ($W["success"]) {
 	$res = cURL("http://dict.revised.moe.edu.tw/cbdic/search.htm", false, true);
 	if ($res === false) {
 		$W["success"] = false;
-		WriteLog("fetch page 1 fail");
+		WriteLog("[res][error] fetch page 1");
 	}
 }
 if ($W["success"]) {
@@ -112,7 +112,7 @@ if ($W["success"]) {
 	$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi/?&o={$W["o"]}&", false, true);
 	if ($res === false) {
 		$W["success"] = false;
-		WriteLog("fetch page 2 fail");
+		WriteLog("[res][error] fetch page 2");
 		exit;
 	}
 }
@@ -122,7 +122,7 @@ if ($W["success"]) {
 		$W["o"] = $m[2];
 		$W["sec"] = $m[3];
 	} else {
-		WriteLog("get token fail");
+		WriteLog("[res][error] fetch page token");
 	}
 }
 foreach ($row as $data) {
@@ -131,7 +131,6 @@ foreach ($row as $data) {
 		foreach ($entry['messaging'] as $messaging) {
 			$mmid = "m_".$messaging['message']['mid'];
 			$res = cURL($C['FBAPI'].$mmid."?fields=from&access_token=".$C['FBpagetoken']);
-			WriteLog($res);
 			$res = json_decode($res, true);
 			$uid = $res["from"]["id"];
 
@@ -140,15 +139,14 @@ foreach ($row as $data) {
 			$sth->execute();
 			$row = $sth->fetch(PDO::FETCH_ASSOC);
 			if ($row === false) {
-				WriteLog("get uid ".$uid);
 				GetTmid();
 				$sth->execute();
 				$row = $sth->fetch(PDO::FETCH_ASSOC);
 				if ($row === false) {
-					WriteLog("uid not found uid=".$uid." res=".json_encode($messaging));
+					WriteLog("[rees][error][uid404] uid=".$uid);
 					continue;
 				} else {
-					WriteLog("new user: uid=".$uid);
+					WriteLog("[res][info][newuser] uid=".$uid);
 				}
 			}
 			$tmid = $row["tmid"];
@@ -170,8 +168,8 @@ foreach ($row as $data) {
 			);
 			$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi", $post, true);
 			if ($res === false) {
-				WriteLog("search fail: msg=".$msg);
-				SendMessage($tmid, "查詢網頁失敗");
+				WriteLog("[res][error] fetch page search");
+				SendMessage($tmid, $M["fail"]);
 				continue;
 			}
 			$mulit = preg_match("/正文資料<font class=numfont>(\d+)<\/font>則/", $res, $m);
