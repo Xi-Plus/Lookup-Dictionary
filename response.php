@@ -157,7 +157,7 @@ foreach ($row as $data) {
 				continue;
 			}
 			if (!$W["success"]) {
-				SendMessage($tmid, $M["nottext"]);
+				SendMessage($tmid, $M["fail"]);
 				continue;
 			}
 			$msg = $messaging['message']['text'];
