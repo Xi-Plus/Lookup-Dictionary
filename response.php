@@ -168,7 +168,7 @@ foreach ($row as $data) {
 			);
 			$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi", $post, true);
 			if ($res === false) {
-				WriteLog("[res][error] fetch page search");
+				WriteLog("[res][error] fetch page search 1");
 				SendMessage($tmid, $M["fail"]);
 				continue;
 			}
@@ -185,6 +185,11 @@ foreach ($row as $data) {
 					preg_match_all("/<td class=maintd.> <a href=\"(.+?)\" class/", $res, $m);
 					foreach ($m[1] as $key => $url) {
 						$res = cURL("http://dict.revised.moe.edu.tw/".$url, false, true);
+						if ($res === false) {
+							WriteLog("[res][error] fetch page search 2");
+							SendMessage($tmid, $M["fail"]);
+							break;
+						}
 						$response = GetResult($res);
 						if ($cnt != 1) {
 							$response = "#".($key+1)."\n".$response;
