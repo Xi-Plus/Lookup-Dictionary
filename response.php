@@ -1,9 +1,9 @@
 <?php
 date_default_timezone_set("Asia/Taipei");
 require(__DIR__.'/config/config.php');
-require(__DIR__.'/curl.php');
-require(__DIR__.'/log.php');
-require(__DIR__.'/sendmessage.php');
+require(__DIR__.'/function/curl.php');
+require(__DIR__.'/function/log.php');
+require(__DIR__.'/function/sendmessage.php');
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}input` ORDER BY `time` ASC");
 $res = $sth->execute();
