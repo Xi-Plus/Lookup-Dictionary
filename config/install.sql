@@ -22,7 +22,8 @@ CREATE TABLE `dictionary_log` (
 CREATE TABLE `dictionary_user` (
   `uid` varchar(255) NOT NULL,
   `tmid` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `name` varchar(255) NOT NULL,
+  `lastlicense` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

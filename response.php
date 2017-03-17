@@ -137,25 +137,27 @@ foreach ($row as $data) {
 			$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}user` WHERE `uid` = :uid");
 			$sth->bindValue(":uid", $uid);
 			$sth->execute();
-			$row = $sth->fetch(PDO::FETCH_ASSOC);
-			if ($row === false) {
+			$user = $sth->fetch(PDO::FETCH_ASSOC);
+			if ($user === false) {
 				GetTmid();
 				$sth->execute();
-				$row = $sth->fetch(PDO::FETCH_ASSOC);
-				if ($row === false) {
+				$user = $sth->fetch(PDO::FETCH_ASSOC);
+				if ($user === false) {
 					WriteLog("[rees][error][uid404] uid=".$uid);
 					continue;
 				} else {
 					WriteLog("[res][info][newuser] uid=".$uid);
 				}
 			}
-			$tmid = $row["tmid"];
+			$tmid = $user["tmid"];
 			if (!isset($messaging['message']['text'])) {
-				SendMessage($tmid, $M["nottext"]);
+				SendMessage($tmid, "請輸入欲搜尋文字");
 				continue;
 			}
 			if (!$W["success"]) {
-				SendMessage($tmid, $M["fail"]);
+				SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
+					"您可以查看網頁是否正常\n".
+					"http://dict.revised.moe.edu.tw/cbdic/search.htm");
 				continue;
 			}
 			$msg = $messaging['message']['text'];
@@ -169,7 +171,9 @@ foreach ($row as $data) {
 			$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi", $post, true);
 			if ($res === false) {
 				WriteLog("[res][error] fetch page search 1");
-				SendMessage($tmid, $M["fail"]);
+				SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
+					"您可以查看網頁是否正常\n".
+					"http://dict.revised.moe.edu.tw/cbdic/search.htm");
 				continue;
 			}
 			$mulit = preg_match("/正文資料<font class=numfont>(\d+)<\/font>則/", $res, $m);
@@ -187,7 +191,9 @@ foreach ($row as $data) {
 						$res = cURL("http://dict.revised.moe.edu.tw/".$url, false, true);
 						if ($res === false) {
 							WriteLog("[res][error] fetch page search 2");
-							SendMessage($tmid, $M["fail"]);
+							SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
+								"您可以查看網頁是否正常\n".
+								"http://dict.revised.moe.edu.tw/cbdic/search.htm");
 							break;
 						}
 						$response = GetResult($res);
@@ -201,7 +207,19 @@ foreach ($row as $data) {
 				$response = GetResult($res);
 				SendMessage($tmid, $response);
 			}
-			SendMessage($tmid, $M["license"]);
+			$lastlicense = $user["lastlicense"];
+			if (time() - strtotime($lastlicense) > $C['show_license_interval']) {
+				SendMessage($tmid, "來源：\n".
+					"中華民國教育部（Ministry of Education, R.O.C.）。《重編國語辭典修訂本》（版本編號：2015_20160523）網址：dict.revised.moe.edu.tw\n".
+					"創用 CC－姓名標示－禁止改作 臺灣3.0 版授權條款");
+				$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `lastlicense` = :lastlicense WHERE `tmid` = :tmid");
+				$sth->bindValue(":lastlicense", date("Y-m-d H:i:s"));
+				$sth->bindValue(":tmid", $tmid);
+				$res = $sth->execute();
+				if ($res === false) {
+					WriteLog("[fetch][error][res][license] tmid=".$tmid." msg=".json_encode($sth->errorInfo()));
+				}
+			}
 		}
 	}
 }
