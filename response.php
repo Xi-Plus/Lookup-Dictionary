@@ -186,7 +186,7 @@ foreach ($row as $data) {
 					if ($cnt != 1) {
 						SendMessage($tmid, "找到".$cnt."則結果");
 					}
-					preg_match_all("/<td class=maintd.> <a href=\"(.+?)\" class/", $res, $m);
+					preg_match_all("/<td class=maintd.>[^<]*<a href=\"(.+?)\" class/", $res, $m);
 					foreach ($m[1] as $key => $url) {
 						$res = cURL("http://dict.revised.moe.edu.tw/".$url, false, true);
 						if ($res === false) {
