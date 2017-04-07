@@ -89,12 +89,18 @@ function GetResult($res) {
 		$response .= "相反詞：".strip_tags($m[1])."\n";
 	}
 	if (preg_match("/釋義.*?<\/b><\/th><td class=\"std2\">(.*?)\n/", $res, $m)) {
+		$m[1] = str_replace("\r", "", $m[1]);
 		$m[1] = str_replace("</p>", "</p>\n", $m[1]);
 		$m[1] = str_replace("</li>", "</li>\n", $m[1]);
-		$response .= "釋義：\n".strip_tags($m[1])."\n";
+		$m[1] = strip_tags($m[1]);
+		$m[1] = str_replace("　", " ", $m[1]);
+		$m[1] = preg_replace("/\s\s+$/", " ", $m[1]);
+		$m[1] = preg_replace("/^ $/m", "", $m[1]);
+		$m[1] = preg_replace("/\n+$/", "", $m[1]);
+		$response .= "釋義：\n".$m[1]."\n";
 	}
 	if (preg_match("/本頁網址︰<\/span><input type=\"text\" value=\"(.+?)\" size/", $res, $m)) {
-		$response .= "本頁網址：\n".$m[1]."\n";
+		$response .= "\n本頁網址：\n".$m[1]."\n";
 	}
 	return $response;
 }
