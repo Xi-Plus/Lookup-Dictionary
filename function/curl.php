@@ -7,8 +7,8 @@ function cURL($url, $post=false, $cookie=false) {
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
 	}
 	if ($cookie !== false) {
-		curl_setopt($ch, CURLOPT_COOKIEFILE, "cookie.txt");
-		curl_setopt($ch, CURLOPT_COOKIEJAR, "cookie.txt");
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
 	}
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$res = curl_exec($ch);

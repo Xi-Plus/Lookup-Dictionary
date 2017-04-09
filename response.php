@@ -106,7 +106,7 @@ function GetResult($res) {
 }
 $W["success"] = true;
 if ($W["success"]) {
-	$res = cURL("http://dict.revised.moe.edu.tw/cbdic/search.htm", false, true);
+	$res = cURL("http://dict.revised.moe.edu.tw/cbdic/search.htm", false, $C["cookiepath"]);
 	if ($res === false) {
 		$W["success"] = false;
 		WriteLog("[res][error] fetch page 1");
@@ -115,7 +115,7 @@ if ($W["success"]) {
 if ($W["success"]) {
 	preg_match("/<a href=\"\/cgi-bin\/cbdic\/gsweb\.cgi\/\?&o=(.*?)&\" title/", $res, $m);
 	$W["o"] = $m[1];
-	$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi/?&o={$W["o"]}&", false, true);
+	$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi/?&o={$W["o"]}&", false, $C["cookiepath"]);
 	if ($res === false) {
 		$W["success"] = false;
 		WriteLog("[res][error] fetch page 2");
@@ -174,7 +174,7 @@ foreach ($row as $data) {
 				"selectmode" => "mode1",
 				"qs0" => "^".$msg."$",
 			);
-			$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi", $post, true);
+			$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi", $post, $C["cookiepath"]);
 			if ($res === false) {
 				WriteLog("[res][error] fetch page search 1");
 				SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
@@ -194,7 +194,7 @@ foreach ($row as $data) {
 					}
 					preg_match_all("/<td class=maintd.>[^<]*<a href=\"(.+?)\" class/", $res, $m);
 					foreach ($m[1] as $key => $url) {
-						$res = cURL("http://dict.revised.moe.edu.tw/".$url, false, true);
+						$res = cURL("http://dict.revised.moe.edu.tw/".$url, false, $C["cookiepath"]);
 						if ($res === false) {
 							WriteLog("[res][error] fetch page search 2");
 							SendMessage($tmid, "抓取資料失敗，請稍後再試\n".

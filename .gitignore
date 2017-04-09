@@ -1,1 +1,3 @@
 config/config.php
+data/cookie.txt
+data/updated_time.txt
