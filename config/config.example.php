@@ -13,6 +13,8 @@ $C['DBTBprefix'] = 'dictionary_';
 
 $C['show_license_interval'] = 60*60*24;
 
+$C['LogKeep'] = 86400*7;
+
 $C["allowsapi"] = array("cli");
 
 $C["cookiepath"] = "data/cookie.txt";
