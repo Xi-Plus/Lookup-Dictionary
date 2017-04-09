@@ -13,6 +13,8 @@ $C['DBTBprefix'] = 'dictionary_';
 
 $C['show_license_interval'] = 60*60*24;
 
+$C["allowsapi"] = array("cli");
+
 $C["cookiepath"] = "data/cookie.txt";
 
 $G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8', $C["DBuser"], $C["DBpass"]);
