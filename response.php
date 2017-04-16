@@ -189,7 +189,8 @@ foreach ($row as $data) {
 			if ($mulit) {
 				$cnt = $m[1];
 				if ($cnt == 0) {
-					SendMessage($tmid, "找不到");
+					SendMessage($tmid, "在教育部重編國語辭典修訂本裡找不到「".$msg."」\n".
+						"或許您想要自行搜尋 http://dict.revised.moe.edu.tw/cbdic/search.htm");
 					continue;
 				} else {
 					if ($cnt != 1) {
