@@ -16,42 +16,6 @@ foreach ($row as $data) {
 	$sth->bindValue(":hash", $data["hash"]);
 	$res = $sth->execute();
 }
-function GetTmid() {
-	global $C, $G;
-	$res = cURL($C['FBAPI']."me/conversations?fields=participants,updated_time&access_token=".$C['FBpagetoken']);
-	$updated_time = file_get_contents("updated_time.txt");
-	$newesttime = $updated_time;
-	while (true) {
-		if ($res === false) {
-			WriteLog("[follow][error][getuid]");
-			break;
-		}
-		$res = json_decode($res, true);
-		if (count($res["data"]) == 0) {
-			break;
-		}
-		foreach ($res["data"] as $data) {
-			if ($data["updated_time"] <= $updated_time) {
-				break 2;
-			}
-			if ($data["updated_time"] > $newesttime) {
-				$newesttime = $data["updated_time"];
-			}
-			foreach ($data["participants"]["data"] as $participants) {
-				if ($participants["id"] != $C['FBpageid']) {
-					$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}user` (`uid`, `tmid`, `name`) VALUES (:uid, :tmid, :name)");
-					$sth->bindValue(":uid", $participants["id"]);
-					$sth->bindValue(":tmid", $data["id"]);
-					$sth->bindValue(":name", $participants["name"]);
-					$res = $sth->execute();
-					break;
-				}
-			}
-		}
-		$res = cURL($res["paging"]["next"]);
-	}
-	file_put_contents("updated_time.txt", $newesttime);
-}
 function GetResult($res) {
 	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe52\.gif\".*?>/", "(一) ", $res);
 	$res = preg_replace("/<img src=\"\/cbdic\/images\/words\/fe53\.gif\".*?>/", "(二) ", $res);
@@ -138,37 +102,26 @@ foreach ($row as $data) {
 	$input = json_decode($data["input"], true);
 	foreach ($input['entry'] as $entry) {
 		foreach ($entry['messaging'] as $messaging) {
-			$mmid = "m_".$messaging['message']['mid'];
-			$res = cURL($C['FBAPI'].$mmid."?fields=from&access_token=".$C['FBpagetoken']);
-			$res = json_decode($res, true);
-			if (!isset($res["from"]["id"])) {
-				WriteLog("[rees][error][nouid] msg=".json_encode($res));
-				continue;
-			}
-			$uid = $res["from"]["id"];
-
-			$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}user` WHERE `uid` = :uid");
-			$sth->bindValue(":uid", $uid);
+			$sid = $messaging['sender']['id'];
+			$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}user` WHERE `sid` = :sid");
+			$sth->bindValue(":sid", $sid);
 			$sth->execute();
 			$user = $sth->fetch(PDO::FETCH_ASSOC);
 			if ($user === false) {
-				GetTmid();
-				$sth->execute();
-				$user = $sth->fetch(PDO::FETCH_ASSOC);
-				if ($user === false) {
-					WriteLog("[rees][error][uid404] uid=".$uid);
-					continue;
-				} else {
-					WriteLog("[res][info][newuser] uid=".$uid);
-				}
+				$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}user` (`sid`) VALUES (:sid");
+				$sth->bindValue(":sid", $sid);
+				$res = $sth->execute();
+				$lastlicense = "1970-01-01 00:00:01";
+			} else {
+				$lastlicense = $user["lastlicense"];
 			}
-			$tmid = $user["tmid"];
+
 			if (!isset($messaging['message']['text'])) {
-				SendMessage($tmid, "請輸入欲搜尋文字");
+				SendMessage($sid, "請輸入欲搜尋文字");
 				continue;
 			}
 			if (!$W["success"]) {
-				SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
+				SendMessage($sid, "抓取資料失敗，請稍後再試\n".
 					"您可以查看網頁是否正常\n".
 					"http://dict.revised.moe.edu.tw/cbdic/search.htm");
 				continue;
@@ -184,7 +137,7 @@ foreach ($row as $data) {
 			$res = cURL("http://dict.revised.moe.edu.tw/cgi-bin/cbdic/gsweb.cgi", $post, $C["cookiepath"]);
 			if ($res === false) {
 				WriteLog("[res][error] fetch page search 1");
-				SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
+				SendMessage($sid, "抓取資料失敗，請稍後再試\n".
 					"您可以查看網頁是否正常\n".
 					"http://dict.revised.moe.edu.tw/cbdic/search.htm");
 				continue;
@@ -193,19 +146,19 @@ foreach ($row as $data) {
 			if ($mulit) {
 				$cnt = $m[1];
 				if ($cnt == 0) {
-					SendMessage($tmid, "在教育部重編國語辭典修訂本裡找不到「".$msg."」\n".
+					SendMessage($sid, "在教育部重編國語辭典修訂本裡找不到「".$msg."」\n".
 						"或許您想要自行搜尋 http://dict.revised.moe.edu.tw/cbdic/search.htm");
 					continue;
 				} else {
 					if ($cnt != 1) {
-						SendMessage($tmid, "找到".$cnt."則結果");
+						SendMessage($sid, "找到".$cnt."則結果");
 					}
 					preg_match_all("/<td class=maintd.>[^<]*<a href=\"(.+?)\" class/", $res, $m);
 					foreach ($m[1] as $key => $url) {
 						$res = cURL("http://dict.revised.moe.edu.tw/".$url, false, $C["cookiepath"]);
 						if ($res === false) {
 							WriteLog("[res][error] fetch page search 2");
-							SendMessage($tmid, "抓取資料失敗，請稍後再試\n".
+							SendMessage($sid, "抓取資料失敗，請稍後再試\n".
 								"您可以查看網頁是否正常\n".
 								"http://dict.revised.moe.edu.tw/cbdic/search.htm");
 							break;
@@ -214,24 +167,23 @@ foreach ($row as $data) {
 						if ($cnt != 1) {
 							$response = "#".($key+1)."\n".$response;
 						}
-						SendMessage($tmid, $response);
+						SendMessage($sid, $response);
 					}
 				}
 			} else {
 				$response = GetResult($res);
-				SendMessage($tmid, $response);
+				SendMessage($sid, $response);
 			}
-			$lastlicense = $user["lastlicense"];
 			if (time() - strtotime($lastlicense) > $C['show_license_interval']) {
-				SendMessage($tmid, "來源：\n".
+				SendMessage($sid, "來源：\n".
 					"中華民國教育部（Ministry of Education, R.O.C.）。《重編國語辭典修訂本》（版本編號：2015_20160523）網址：dict.revised.moe.edu.tw\n".
 					"創用 CC－姓名標示－禁止改作 臺灣3.0 版授權條款");
 				$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `lastlicense` = :lastlicense WHERE `tmid` = :tmid");
 				$sth->bindValue(":lastlicense", date("Y-m-d H:i:s"));
-				$sth->bindValue(":tmid", $tmid);
+				$sth->bindValue(":tmid", $sid);
 				$res = $sth->execute();
 				if ($res === false) {
-					WriteLog("[fetch][error][res][license] tmid=".$tmid." msg=".json_encode($sth->errorInfo()));
+					WriteLog("[fetch][error][res][license] tmid=".$sid." msg=".json_encode($sth->errorInfo()));
 				}
 			}
 		}

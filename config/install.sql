@@ -1,4 +1,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,9 +22,7 @@ CREATE TABLE `dictionary_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `dictionary_user` (
-  `uid` varchar(255) NOT NULL,
-  `tmid` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `sid` bigint(20) NOT NULL,
   `lastlicense` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -34,7 +34,8 @@ ALTER TABLE `dictionary_log`
   ADD UNIQUE KEY `hash` (`hash`);
 
 ALTER TABLE `dictionary_user`
-  ADD UNIQUE KEY `tmid` (`tmid`);
+  ADD UNIQUE KEY `sid` (`sid`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
