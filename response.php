@@ -176,7 +176,7 @@ foreach ($row as $data) {
 			}
 			if (time() - strtotime($lastlicense) > $C['show_license_interval']) {
 				SendMessage($sid, "來源：\n".
-					"中華民國教育部（Ministry of Education, R.O.C.）。《重編國語辭典修訂本》（版本編號：2015_20160523）網址：dict.revised.moe.edu.tw\n".
+					"中華民國教育部（Ministry of Education, R.O.C.）。《重編國語辭典修訂本》（版本編號：2015_20160523）網址： dict.revised.moe.edu.tw\n".
 					"創用 CC－姓名標示－禁止改作 臺灣3.0 版授權條款");
 				$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `lastlicense` = :lastlicense WHERE `sid` = :sid");
 				$sth->bindValue(":lastlicense", date("Y-m-d H:i:s"));
